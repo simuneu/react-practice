@@ -18,7 +18,6 @@ function TodoPage() {
     currentFilter, 
     showTodoFrom, 
     showConfirmDialog, 
-    todoToDelete, 
 
     handleToggleComplete, 
     handleDeleteTodo, 
@@ -27,8 +26,7 @@ function TodoPage() {
     handleAddTodo, 
     handleFilterChange, 
     openTodoForm, 
-    closeTodoForm,
-  }=useTodo()
+    closeTodoForm}=useTodo()
 
   const {logout, currentUser}=  useAuth();
 
