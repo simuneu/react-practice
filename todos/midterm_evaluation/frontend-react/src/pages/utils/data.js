@@ -1,5 +1,5 @@
 // js/data.js
-export const todos = [
+export const initialTodos = [
   { id: 1, title: "HTML 기본 태그 복습", description: "p, h1~h6, ul 등", isCompleted: true },
   { id: 2, title: "Flexbox 연습", description: "justify-content, align-items 사용", isCompleted: false },
   { id: 3, title: "부트스트랩 Grid 시스템", description: "row, col 구조 이해", isCompleted: false },
@@ -42,15 +42,15 @@ const delay = (ms)=> new Promise(resolve=>setTimeout(resolve, ms))
 
 export const todoAPI ={
   async fetchTodos(){
-    await delay(8000)
+    await delay(2000)
     return [...initialTodos]
   },
 
   async addTodo(todo) {
     await delay(5000)
-    const newTodo={
+      const newTodo = {
       ...todo,
-      id:initialTodos.reduce((maxId, todos)+1, 0), 
+      id: initialTodos.reduce((maxId, todos) => Math.max(maxId, todos.id) + 1, 0),
     }
     return newTodo;
   },

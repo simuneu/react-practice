@@ -1,5 +1,6 @@
 import React, {createContext, useContext, useEffect, useState} from "react";
-import {todos as initialTodos} from '../pages/utils/data'
+import {todoAPI} from '../pages/utils/data'
+
 const TodoContext = createContext();
 
 export const TodoProvider = ({children})=>{
@@ -10,18 +11,37 @@ export const TodoProvider = ({children})=>{
   const [showConfirmDialog, setShowConfirmDialog] = useState(false)
   const [todoToDelete, setTodoToDelete] =useState(null);
   
-  useEffect(() => {
-    setTodos(initialTodos);
-  }, [])
+  const [loading, setLoading] = useState(true);
+  const [error, setError] =useState(null);
 
-  const handleConfirmDelete=()=>{
-  if(todoToDelete){
-    setTodos(prevTodos=>prevTodos.filter(todo=>
-      todo.id !== todoToDelete
-    ))
-      setTodoToDelete(null)
+  useEffect(() => {
+    loadTodos();
+  }, []);
+
+  const loadTodos= async()=>{
+    try{
+      setLoading(true)
+      const data = await todoAPI.fetchTodos();
+      setTodos(data)
+    }catch(e){
+      setError(true)
+      throw Error();
+    }finally{
+      setLoading(false);
+    }
   }
-  setShowConfirmDialog(false)
+
+  const handleConfirmDelete=async()=>{
+    if(!todoToDelete) return ;
+    try{
+      await todoAPI.deleteTodo(todoToDelete);
+      setTodos(prevTodos=>prevTodos.filter(todo=>todo.id !== todoToDelete))
+      setTodoToDelete(null)
+    }catch(e){
+      
+    }finally{
+      setShowConfirmDialog(false)
+    }
   }
 
   const handleCancelDelete=()=>{
@@ -35,20 +55,33 @@ export const TodoProvider = ({children})=>{
     setShowConfirmDialog(true)
   }
   
-  const handleAddTodo = (newTodo) => {
-    setTodos(prevTodos => [...prevTodos, newTodo]);
+  const handleAddTodo = async(newTodo) => {
+    try{
+      const addedTodo=await todoAPI.addTodo(newTodo);
+      setTodos(prevTodos => [...prevTodos, newTodo]);
+      return{success:true}
+    }catch(e){
+      return {success:false, error:e.message}
+    }
   }
 
   const handleFilterChange=(filter)=>{
     setCurrentFilter(filter)
   }
 
-  const handleToggleComplete=(todoId)=>{
-    setTodos(
-      prevTodos=>prevTodos.map(todo=>
-        todo.id === todoId ?{...todo, isCompleted:!todo.isCompleted}:todo
+  const handleToggleComplete= async(todoId)=>{
+    try{
+      const todo = todos.find(t=>t.id===todoId)
+      if(!todo) return;
+      const result = await todoAPI.toggleTodo(todoId, !todo.isCompleted)
+      setTodos(
+        prevTodos=>prevTodos.map(todo=>
+          todo.id === todoId ?{...todo, isCompleted:result.isCompleted}:todo
+        )
       )
-    )
+    }catch(e){
+
+    }
   }
 
   const openTodoForm = ()=>setShowTodoForm(true)
