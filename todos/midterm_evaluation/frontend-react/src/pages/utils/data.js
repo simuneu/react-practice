@@ -7,7 +7,7 @@ export const todos = [
   { id: 5, title: "JS 이벤트 처리", description: "버튼 클릭 이벤트 연결", isCompleted: false },
   { id: 6, title: "localStorage 학습", description: "토큰 저장/조회 구현", isCompleted: true },
   { id: 7, title: "Card 컴포넌트 만들기", description: "할 일 항목 UI 구성", isCompleted: false },
-  { id: 8, "title": "filter 함수 사용법", description: "배열 조건 필터링", isCompleted: true },
+  { id: 8, title: "filter 함수 사용법", description: "배열 조건 필터링", isCompleted: true },
   { id: 9, title: "삼항 연산자 복습", description: "렌더링 조건 표현에 사용", isCompleted: false },
   { id: 10, title: "Todo 삭제 기능 설계", description: "옵션 항목 (필수 아님)", isCompleted: false },
   { id: 11, title: "폼 유효성 검사", description: "필수 입력 검사", isCompleted: true },

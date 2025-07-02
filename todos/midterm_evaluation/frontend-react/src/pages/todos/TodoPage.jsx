@@ -1,76 +1,45 @@
 import React, { useEffect, useState } from 'react'
 import Header from '../../components/ui/Header'
-import { useNavigate } from 'react-router-dom';
-import { todos as initialTodos } from '../utils/data';
+import {useNavigate } from 'react-router-dom';
 import TodoList from '../../components/todo/TodoList';
-import TodoFilter from '../../components/todo/TodoFilter';
 import TodoForm from '../../components/todo/TodoForm';
 import ConfirmDialog from '../../components/ui/ConfirmDialog';
 import TodoAction from '../../components/ui/TodoAction';
 import TodoState from '../../components/ui/TodoState';
+import {useTodo} from '../../context/TodoContext'
+import {useAuth} from '../../context/AuthContext'
 
 // App.jsx에서 props전달받음
-function TodoPage({ currentUser, onLogout }) {
+function TodoPage() {
 
   const navigate = useNavigate();
+  const {
+    todos, 
+    currentFilter, 
+    showTodoFrom, 
+    showConfirmDialog, 
+    todoToDelete, 
 
-  //todos는 바뀔수 있기 때문에 state
-  const [todos, setTodos] = useState([]);
-  const [currentFilter, setCurrentFilter] = useState('all');
-  const [showTodoFrom, setShowTodoForm] = useState(false);
+    handleToggleComplete, 
+    handleDeleteTodo, 
+    handleConfirmDelete, 
+    handleCancelDelete, 
+    handleAddTodo, 
+    handleFilterChange, 
+    openTodoForm, 
+    closeTodoForm,
+  }=useTodo()
 
-  const [showConfirmDialog, setShowConfirmDialog] = useState(false)
-  const [todoToDelete, setTodoToDelete] =useState(null);
-
-  useEffect(() => {
-    setTodos(initialTodos);
-  }, [])
+  const {logout, currentUser}=  useAuth();
 
   const handleLogout = () => {
-    onLogout();
+    logout();
     navigate('/login');
   };
 
   if (!currentUser) {
     navigate('/login');
     return null;
-  }
-
-  //TodoForm에서 data를 사용하기 위해 prop 내려줌
-  const handleAddTodo = (newTodo) => {
-    setTodos(prevTodos => [...prevTodos, newTodo]);
-  }
-
-  const handleToggleComplete=(todoId)=>{
-    setTodos(
-      prevTodos=>prevTodos.map(todo=>
-        todo.id === todoId ?{...todo, isCompleted:!todo.isCompleted}:todo
-      )
-    )
-  }
-
-  const handleDeleteTodo=(todoId)=>{
-    setTodoToDelete(todoId)
-    setShowConfirmDialog(true)
-  }
-
-  const handleFilterChange=(filter)=>{
-    setCurrentFilter(filter)
-  }
-
-  const handleConfirmDelete=()=>{
-    if(todoToDelete){
-      setTodos(prevTodos=>prevTodos.filter(todo=>
-        todo.id !== todoToDelete
-      ))
-        setTodoToDelete(null)
-    }
-    setShowConfirmDialog(false)
-  }
-  const handleCancelDelete=()=>{
-    setTodoToDelete(null)
-    setShowConfirmDialog(false)
-
   }
 
   return (
@@ -81,7 +50,7 @@ function TodoPage({ currentUser, onLogout }) {
             <TodoState
               todos={todos}/>
             <TodoAction
-              onAddClick={()=>setShowTodoForm(true)}
+              onAddClick={openTodoForm}
               currentFilter={currentFilter}
               onFilterChange={handleFilterChange}
             />
@@ -94,7 +63,7 @@ function TodoPage({ currentUser, onLogout }) {
         />
         <TodoForm 
           show={showTodoFrom}
-          onClose={() =>  setShowTodoForm(false)}
+          onClose={closeTodoForm}
           onAddTodo = {handleAddTodo}//TodoFrom에 props내려주기
         />
         <ConfirmDialog

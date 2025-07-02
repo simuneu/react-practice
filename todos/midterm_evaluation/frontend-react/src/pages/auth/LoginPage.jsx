@@ -1,21 +1,24 @@
 import React, { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { users } from '../utils/data';
+import { useAuth } from '../../context/AuthContext';
 
-function LoginPage({ currentUser, onLogin }) {
+// console.log("LoginPage 렌더링됨");
+function LoginPage() {
   const navigate = useNavigate();
-
-  // 아이디, 비번은 계속 바뀌니까 useState 사용
+  const {currentUser, login} = useAuth();
+  
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
-
+  
   useEffect(() => {
     if (currentUser) {
       navigate('/todo')
     }
   }, [currentUser, navigate])
-
+  
+  
   const handleSubmit = (e) => {
     e.preventDefault();
 
@@ -34,8 +37,8 @@ function LoginPage({ currentUser, onLogin }) {
     if (foundUser) {
       // localStorage에 저장
       setErrorMessage(''); // 에러 메시지 초기화
-      onLogin({ email: foundUser.email })
-      navigate('/todo')
+      login({ email: foundUser.email })
+      // navigate('/todo')
     } else {
       setErrorMessage('잘못된 이메일 또는 비밀번호 입니다.');
     }
