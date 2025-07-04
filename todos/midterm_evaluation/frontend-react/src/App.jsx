@@ -4,6 +4,18 @@ import TodoPage from "./pages/todos/TodoPage";
 import "./assets/styles/App.css"
 import { AuthProvider, useAuth} from "./context/AuthContext";
 import { TodoProvider } from "./context/TodoContext";
+import {QueryClient, QueryClientProvider} from '@tanstack/react-query'
+
+const queryClient = new QueryClient({
+  defaultOption :{
+    queries:{
+      staleTime:5*60*1000, //5분간 데이터 fresh로 유지
+      cacheTime:10*60*1000, //10분간 캐시유지
+      retry:3,  //실패 3번 재시도
+      refetchError:false, //창 포커스시 자동 새로고림 비활성
+    },
+  }
+})
 
 const AppRouter = ()=>{
   const {loading}=useAuth();
@@ -18,13 +30,15 @@ const AppRouter = ()=>{
 
 function App() {
   return (
-    <BrowserRouter>
-      <AuthProvider>
-        <TodoProvider>
-          <AppRouter/>
-        </TodoProvider>
-      </AuthProvider>
-    </BrowserRouter>
+    <QueryClientProvider client={queryClient}>
+      <BrowserRouter>
+        <AuthProvider>
+          <TodoProvider>
+            <AppRouter/>
+          </TodoProvider>
+        </AuthProvider>
+      </BrowserRouter>
+    </QueryClientProvider>
   );
 }
 

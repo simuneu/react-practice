@@ -2,8 +2,10 @@ import React, {useMemo} from 'react'
 import TodoCard from './TodoCard';
 import EmptyState from '../ui/EmptyState'
 
-const TodoList = ({todos, currentFilter, onToggleComplete, onDeleteTodo}) => {
-  const getFilteredTodos =useMemo(()=>{
+const TodoList = ({todos, currentFilter, onToggleComplete, 
+  onDeleteTodo, isLoading=false}) => {
+    
+  const filteredTodos  =useMemo(()=>{
      switch(currentFilter){
       case 'completed':
         return todos.filter(todo =>todo.isCompleted)
@@ -14,13 +16,10 @@ const TodoList = ({todos, currentFilter, onToggleComplete, onDeleteTodo}) => {
     }
   },[todos, currentFilter])
 
-  const FilteredTodos = getFilteredTodos;
-
-  if(FilteredTodos.length ===0){
+  if(filteredTodos.length ===0){
     return (
       <EmptyState
         message="표시할 할 일이 없습니다."
-        currentFilter={currentFilter}
         />
     )
   }
@@ -33,11 +32,10 @@ const TodoList = ({todos, currentFilter, onToggleComplete, onDeleteTodo}) => {
             onToggleComplete={onToggleComplete}
             onDeleteTodo={onDeleteTodo}
             todo={todo}
+            isLoading={isLoading}
           />
-
         </div>
       ))
-        
       }
     </div>
   )

@@ -1,4 +1,5 @@
-// js/data.js
+// utils/data.js - 비동기 API 서비스
+
 export const initialTodos = [
   { id: 1, title: "HTML 기본 태그 복습", description: "p, h1~h6, ul 등", isCompleted: true },
   { id: 2, title: "Flexbox 연습", description: "justify-content, align-items 사용", isCompleted: false },
@@ -7,7 +8,7 @@ export const initialTodos = [
   { id: 5, title: "JS 이벤트 처리", description: "버튼 클릭 이벤트 연결", isCompleted: false },
   { id: 6, title: "localStorage 학습", description: "토큰 저장/조회 구현", isCompleted: true },
   { id: 7, title: "Card 컴포넌트 만들기", description: "할 일 항목 UI 구성", isCompleted: false },
-  { id: 8, title: "filter 함수 사용법", description: "배열 조건 필터링", isCompleted: true },
+  { id: 8, "title": "filter 함수 사용법", description: "배열 조건 필터링", isCompleted: true },
   { id: 9, title: "삼항 연산자 복습", description: "렌더링 조건 표현에 사용", isCompleted: false },
   { id: 10, title: "Todo 삭제 기능 설계", description: "옵션 항목 (필수 아님)", isCompleted: false },
   { id: 11, title: "폼 유효성 검사", description: "필수 입력 검사", isCompleted: true },
@@ -38,49 +39,103 @@ export const initialUsers = [
   { email: "guest@example.com", password: "guest" }
 ];
 
-const delay = (ms)=> new Promise(resolve=>setTimeout(resolve, ms))
+const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
-export const todoAPI ={
-  async fetchTodos(){
-    await delay(2000)
-    return [...initialTodos]
+
+export const todoAPI = {
+  async fetchTodos() {
+    await delay(800); // API 호출 시뮬레이션
+    return [...initialTodos];
   },
 
+
   async addTodo(todo) {
-    await delay(5000)
-      const newTodo = {
+    await delay(500);
+    const newTodo = {
       ...todo,
-      id: initialTodos.reduce((maxId, todos) => Math.max(maxId, todos.id) + 1, 0),
-    }
+      id: Date.now(), // 임시 ID 생성
+    };
     return newTodo;
   },
 
-  async toggleTodo(todoId, isCompleted){
-    await delay(3000)
-    return {id:todoId, isCompleted}
-  },
-  
-  async deleteTodo(todoId){
-    await delay(3000)
-    return todoId
+ 
+  async toggleTodo(todoId, isCompleted) {
+    await delay(300);
+    return { id: todoId, isCompleted };
   },
 
-  async updateTodo(todoId, updates){
-    await delay(4000)
-    return {id:todoId, ...updates}
+
+  async deleteTodo(todoId) {
+    await delay(300);
+    return todoId;
+  },
+
+
+  async updateTodo(todoId, updates) {
+    await delay(400);
+    return { id: todoId, ...updates };
   }
-}
+};
 
-export const userAPI={
-  async login(email, password){
-    await delay(3000)
-    const user = initialUsers.find(user=>
-      user.email ===email &&
-      user.password === password
-    )
-    if(user){
-      return {success:true, use:{email:user.email}}
+export const userAPI = {
+  async login(email, password) {
+    await delay(600);
+    const user = initialUsers.find(u => u.email === email && u.password === password);
+    if (user) {
+      return { success: true, user: { email: user.email } };
     }
-    throw new Error("로그인 실패")
+    throw new Error('Invalid credentials');
+  },
+};
+
+
+export const todoStats = {
+  calculateStats(todos) {
+    const total = todos.length;
+    const completed = todos.filter(todo => todo.isCompleted).length;
+    const pending = total - completed;
+    const completionRate = total > 0 ? Math.round((completed / total) * 100) : 0;
+
+    return {
+      total,
+      completed,
+      pending,
+      completionRate
+    };
+  },
+
+
+  filteredTodos(todos, filter) {
+    switch (filter) {
+      case 'completed':
+        return todos.filter(todo => todo.isCompleted);
+      case 'pending':
+        return todos.filter(todo => !todo.isCompleted);
+      default:
+        return todos;
+    }
+  },
+
+ 
+  sortTodos(todos, sortBy = 'id') {
+    return [...todos].sort((a, b) => {
+      switch (sortBy) {
+        case 'title':
+          return a.title.localeCompare(b.title);
+        case 'completed':
+          return a.isCompleted === b.isCompleted ? 0 : a.isCompleted ? 1 : -1;
+        case 'id':
+        default:
+          return a.id - b.id;
+      }
+    });
   }
-}
+};
+
+export const handleAPIError = (error) => {
+  console.error('API Error:', error);
+  return {
+    success: false,
+    error: error.message || 'An unexpected error occurred'
+  };
+}; 
